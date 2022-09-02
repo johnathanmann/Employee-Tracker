@@ -48,32 +48,48 @@ const mainMenu = [
       }
     ];
 
+  const addRole = [
+    {
+      type:"input",
+      message: "What is the role?",
+      name: "roleName"
+    },
+    {
+      type:"input",
+      message: "What is the roles salary?",
+      name: "roleSalary"
+    }
+  ]
+
+function populateTables(){
+  db.query('SOURCE db/employee_seeds.sql', function (err, results) {
+  });
+}
+
 function askQuestions() {
+  db.query('SOURCE db/schema.sql', function (err, results) {
+  });
 return inquirer.prompt(mainMenu)
 .then((response) =>{
   if (response.mainMenu === "View All Departments" ) {
-    db.query('SELECT * FROM department', function (err, results) {
-      // const transformed = results.reduce((acc, {id, ...x}) => { acc[id] = x; return acc}, {})
-      // console.table(transformed)
-      console.table(results);
-      askQuestions()
+    db.query('UPDATE db/department_seeds.sql', function (err,results){
+      db.query('SELECT * FROM department', function (err, results) {
+        console.table(results);
+        askQuestions()
+      })
     })
   } 
   if (response.mainMenu === "View All Roles" ) {
-    db.query('SELECT * FROM roles', function (err, results) {
-      // const transformed = results.reduce((acc, {id, ...x}) => { acc[id] = x; return acc}, {})
-      // console.table(transformed)
-      console.table(results);
-      askQuestions()
-    })
+      db.query('SELECT * FROM roles', function (err, results) {
+        console.table(results);
+        askQuestions()
+      })
   } 
   if (response.mainMenu === "View All Employees" ) {
-    // Query database to find all employees
+    db.query('SOURCE db/employee_seeds.sql', function (err, results) {
+    })
     db.query('SELECT * FROM employee', function (err, results) {
-      // const transformed = results.reduce((acc, {id, ...x}) => { acc[id] = x; return acc}, {})
-      // console.table(transformed)
-      console.table(results);
-      askQuestions()
+      console.table(results)
     })
   }
   if (response.mainMenu === "Add a Department" ) {
@@ -85,15 +101,21 @@ return inquirer.prompt(mainMenu)
     });
   } 
   if (response.mainMenu === "Add a Role" ) {
-
+    return inquirer.prompt(addRole).then((response) =>{
+      db.query("INSERT INTO roles (title, salary) VALUES ('"+response.roleName+"', '"+response.roleSalary+"')", function(err, res) {
+        if (err) throw err;
+        askQuestions();
+      });
+    })
   }
   if (response.mainMenu === "Add an Employee" ) {
-
+    
   }  
   if (response.mainMenu === "Update Employee Role" ) {
 
   } 
 });
 };
-
+db.query('SOURCE db/schema.sql', function (err, results) {
+});
 askQuestions();
