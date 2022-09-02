@@ -48,6 +48,14 @@ const mainMenu = [
       }
     ];
 
+    const newDepartment = [
+      {
+        type:"input",
+        message: "What is the department?",
+        name: "department"
+      }
+    ]
+
   const addRole = [
     {
       type:"input",
@@ -72,11 +80,9 @@ function askQuestions() {
 return inquirer.prompt(mainMenu)
 .then((response) =>{
   if (response.mainMenu === "View All Departments" ) {
-    db.query('UPDATE db/department_seeds.sql', function (err,results){
-      db.query('SELECT * FROM department', function (err, results) {
-        console.table(results);
-        askQuestions()
-      })
+    db.query('SELECT * FROM department', function (err, results) {
+      console.table(results);
+      askQuestions()
     })
   } 
   if (response.mainMenu === "View All Roles" ) {
@@ -93,13 +99,13 @@ return inquirer.prompt(mainMenu)
     })
   }
   if (response.mainMenu === "Add a Department" ) {
-
-    fs.appendFile("./db/seeds/department_seeds_sql", '' , (err) => { 
-      if (err) { 
-        console.log(err); 
-      } 
-    });
-  } 
+    return inquirer.prompt(newDepartment).then((response) =>{
+      db.query("INSERT INTO department (department_name) VALUES ('"+response.department+"')", function(err, res) {
+        if (err) throw err;
+        askQuestions();
+      });
+    })
+  }
   if (response.mainMenu === "Add a Role" ) {
     return inquirer.prompt(addRole).then((response) =>{
       db.query("INSERT INTO roles (title, salary) VALUES ('"+response.roleName+"', '"+response.roleSalary+"')", function(err, res) {
